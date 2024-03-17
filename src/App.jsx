@@ -4,35 +4,44 @@ import Formulario from './components/Formulario';
 import Buscador from './components/Buscador';
 import Alert from './components/Alert';
 import { BaseColaboradores } from './BaseColaboradores';
-import 'bootstrap/dist/css/bootstrap.min.css'; // Asegúrate de que Bootstrap está instalado
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
   const [colaboradores, setColaboradores] = useState(BaseColaboradores);
-  const [filtro, setFiltro] = useState("");
+  const [filtro, setFiltro] = useState('');
+  const [alerta, setAlerta] = useState({ mensaje: '', tipo: '' });
 
-  const agregarColaborador = (nuevoColaborador) => {
-    // Agregar lógica para agregar colaborador
-    // setColaboradores([...colaboradores, nuevoColaborador]);
+  const agregarColaborador = nuevoColaborador => {
+    setColaboradores(prevColaboradores => [...prevColaboradores, nuevoColaborador]);
+    setAlerta({ mensaje: 'Colaborador agregado con éxito', tipo: 'success' });
   };
 
-  // Filtrar colaboradores según el término de búsqueda
-  const colaboradoresFiltrados = colaboradores.filter(
-    (col) => {
-      return (
-        col.nombre.toLowerCase().includes(filtro.toLowerCase()) ||
-        col.correo.toLowerCase().includes(filtro.toLowerCase()) ||
-        col.cargo.toLowerCase().includes(filtro.toLowerCase()) ||
-        col.telefono.includes(filtro)
-      );
-    }
-  );
+  const mostrarAlerta = (mensaje, tipo) => {
+    setAlerta({ mensaje, tipo });
+    setTimeout(() => setAlerta({ mensaje: '', tipo: '' }), 5000);
+  };
+
+  const colaboradoresFiltrados = colaboradores.filter(col => {
+    return (
+      col.nombre.toLowerCase().includes(filtro.toLowerCase()) ||
+      col.correo.toLowerCase().includes(filtro.toLowerCase()) ||
+      col.cargo.toLowerCase().includes(filtro.toLowerCase()) ||
+      col.telefono.includes(filtro)
+    );
+  });
 
   return (
     <div className="container mt-5">
-      <Alert mensaje={""} tipo={""} />
+      {alerta.mensaje && <Alert mensaje={alerta.mensaje} tipo={alerta.tipo} />}
       <Buscador setFiltro={setFiltro} />
-      <Listado colaboradores={colaboradoresFiltrados} />
-      <Formulario agregarColaborador={agregarColaborador} />
+      <div className="row">
+        <div className="col-lg-8">
+          <Listado colaboradores={colaboradoresFiltrados} />
+        </div>
+        <div className="col-lg-4">
+          <Formulario agregarColaborador={agregarColaborador} mostrarAlerta={mostrarAlerta} />
+        </div>
+      </div>
     </div>
   );
 }
